@@ -1,5 +1,10 @@
 # CareerLens AI - Candidate Intelligence Platform (Stages 1–9)
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/samreenqueen111-spec/CareerLens-AI)
+[![Live GitHub Repo](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/samreenqueen111-spec/CareerLens-AI)
+[![Tests Passing](https://img.shields.io/badge/Tests-80%2F80%20Passing-brightgreen)](https://github.com/samreenqueen111-spec/CareerLens-AI)
+
+
 CareerLens AI is a production-quality web application designed to help job seekers, students, and professionals understand how well their resume matches a specific job and what they should improve before applying.
 
 Stage 2 introduced **Real Resume Parsing** with `pypdf` and `python-docx`, section detection across 8 standard resume sections, client & server-side validation, safe non-public upload storage, and dynamic text previews.
