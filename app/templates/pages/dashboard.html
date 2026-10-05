@@ -1,0 +1,1148 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container section-sm">
+  <!-- Breadcrumb -->
+  <div class="flex items-center gap-2" style="font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 0.75rem;">
+    <a href="{{ url_for('main.index') }}" style="color: var(--text-muted);">Home</a>
+    <span>/</span>
+    <a href="{{ url_for('analyzer.analyzer_view') }}" style="color: var(--text-muted);">Analyzer</a>
+    <span>/</span>
+    <span style="color: var(--text-main);">Results Dashboard</span>
+  </div>
+
+  <!-- Dashboard Top Action Header -->
+  <div class="dashboard-header">
+    <div class="dashboard-title-area">
+      <h1>{{ analysis.job_title }}</h1>
+      <div class="dashboard-meta">
+        <div class="meta-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+          <span>{{ analysis.company }}</span>
+        </div>
+        <span>•</span>
+        <div class="meta-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <span>{{ analysis.resume_filename }} ({{ analysis.resume_size_kb }} KB)</span>
+        </div>
+        <span>•</span>
+        <div class="meta-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>{{ analysis.analyzed_at }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header Action CTAs -->
+    <div class="flex items-center gap-3">
+      <a href="{{ url_for('analyzer.download_report_view', analysis_id=analysis.id) }}" id="download-report-btn" class="btn btn-secondary" title="Download Official Analysis PDF Report">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span>Download Report</span>
+      </a>
+
+      <button type="button" id="export-report-btn" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 9V2h12v7"></path>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        <span>Print</span>
+      </button>
+
+      <a href="{{ url_for('analyzer.analyzer_view') }}" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>New Analysis</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Status Banner (Sample Preview or Live Stage 4 Match Engine) -->
+  <div class="preview-banner">
+    <div class="flex items-center gap-3">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <div>
+        {% if analysis.scores and not analysis.is_preview %}
+        <strong>Real Match &amp; ATS Audit Complete:</strong>
+        Your match score is calculated transparently from verified skills, work experience, key terms, and education.
+        {% elif analysis.job_analysis or analysis.parsed_resume %}
+        <strong>Real Document &amp; Job Analysis Active (Stages 2 &amp; 3):</strong>
+        Live resume text and job description requirements extracted via Python NLP services.
+        {% else %}
+        <strong>Stage 1 Prototype Preview:</strong>
+        Displaying sample analysis data. Real-time document parsing, NLP embeddings, and dynamic AI scoring will connect in Stage 2.
+        {% endif %}
+      </div>
+    </div>
+    {% if analysis.scores and not analysis.is_preview %}
+    <span class="badge badge-success" style="flex-shrink: 0;">Stage 4 Engine Active (Stages 2 & 3 Live) • Stage 5 Audit Active</span>
+    {% elif analysis.job_analysis or analysis.parsed_resume %}
+    <span class="badge badge-success" style="flex-shrink: 0;">Stages 2 & 3 Live</span>
+    {% else %}
+    <span class="badge badge-info" style="flex-shrink: 0;">Sample Fixture</span>
+    {% endif %}
+  </div>
+
+  <!-- Primary Score Hero Section -->
+  <div class="score-overview-grid">
+    <!-- Overall Score Gauge Card -->
+    <div class="overall-score-card">
+      <div class="score-radial-wrapper">
+        <svg viewBox="0 0 120 120" class="score-radial-svg" aria-hidden="true">
+          <circle class="score-radial-bg" cx="60" cy="60" r="50"></circle>
+          <circle class="score-radial-meter" cx="60" cy="60" r="50" data-score="{{ analysis.scores.overall_match }}"></circle>
+        </svg>
+        <div class="score-radial-text">
+          <span class="score-number count-up" data-target="{{ analysis.scores.overall_match }}">0%</span>
+          <span class="score-label">Overall Match</span>
+        </div>
+      </div>
+
+      <span class="badge {{ analysis.score_verdict.color_class }}" style="margin-bottom: 0.75rem; font-size: var(--text-sm); display: inline-flex; align-items: center; gap: 0.35rem;">
+        {% if analysis.scores.overall_match >= 75 %}
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        {% elif analysis.scores.overall_match >= 50 %}
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        {% else %}
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+        {% endif %}
+        <span>{{ analysis.score_verdict.label }}</span>
+      </span>
+
+      <p style="font-size: var(--text-xs); color: var(--text-secondary); max-width: 280px; margin-bottom: 0; line-height: 1.5;">
+        {{ analysis.score_verdict.summary }}
+      </p>
+    </div>
+
+    <!-- Submetrics 5-Card Responsive Grid -->
+    <div class="submetrics-grid">
+      <!-- 1. Skills Match -->
+      <div class="metric-card">
+        <div class="metric-card-content">
+          <div class="metric-header">
+            <div class="flex items-center gap-2">
+              <div class="metric-icon-box metric-icon-skills">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="16 18 22 12 16 6"></polyline>
+                  <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+              </div>
+              <span class="metric-title">Skills Match</span>
+            </div>
+            <span class="badge {% if analysis.scores.skills_match >= 75 %}badge-success{% elif analysis.scores.skills_match >= 50 %}badge-warning{% else %}badge-danger{% endif %}">
+              {% if analysis.scores.skills_match >= 75 %}High Match{% elif analysis.scores.skills_match >= 50 %}Moderate{% else %}Low Match{% endif %}
+            </span>
+          </div>
+          <div class="metric-value"><span class="count-up" data-target="{{ analysis.scores.skills_match }}">0%</span></div>
+          <p class="metric-desc">{{ analysis.scores_explanation.skills_match if analysis.scores_explanation else 'Alignment across core technical requirements and preferred competencies.' }}</p>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill {% if analysis.scores.skills_match >= 75 %}fill-success{% elif analysis.scores.skills_match >= 50 %}fill-warning{% else %}fill-danger{% endif %}" data-percent="{{ analysis.scores.skills_match }}" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- 2. Keyword Match / Coverage -->
+      <div class="metric-card">
+        <div class="metric-card-content">
+          <div class="metric-header">
+            <div class="flex items-center gap-2">
+              <div class="metric-icon-box metric-icon-keywords">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
+              <span class="metric-title">Keyword Match</span>
+            </div>
+            <span class="badge {% if (analysis.scores.keyword_match or analysis.scores.keyword_coverage) >= 75 %}badge-success{% elif (analysis.scores.keyword_match or analysis.scores.keyword_coverage) >= 50 %}badge-warning{% else %}badge-danger{% endif %}">
+              {% if (analysis.scores.keyword_match or analysis.scores.keyword_coverage) >= 75 %}Strong{% elif (analysis.scores.keyword_match or analysis.scores.keyword_coverage) >= 50 %}Moderate{% else %}Review{% endif %}
+            </span>
+          </div>
+          <div class="metric-value"><span class="count-up" data-target="{{ analysis.scores.keyword_match or analysis.scores.keyword_coverage }}">0%</span></div>
+          <p class="metric-desc">Keyword Coverage: {{ analysis.scores_explanation.keyword_match if analysis.scores_explanation else 'Core job terms and domain concepts found in your resume text.' }}</p>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill {% if (analysis.scores.keyword_match or analysis.scores.keyword_coverage) >= 75 %}fill-success{% elif (analysis.scores.keyword_match or analysis.scores.keyword_coverage) >= 50 %}fill-warning{% else %}fill-danger{% endif %}" data-percent="{{ analysis.scores.keyword_match or analysis.scores.keyword_coverage }}" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- 3. Experience Match / Relevance -->
+      <div class="metric-card">
+        <div class="metric-card-content">
+          <div class="metric-header">
+            <div class="flex items-center gap-2">
+              <div class="metric-icon-box metric-icon-experience">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+              </div>
+              <span class="metric-title">Experience Match</span>
+            </div>
+            <span class="badge {% if (analysis.scores.experience_match or analysis.scores.experience_relevance) >= 75 %}badge-success{% elif (analysis.scores.experience_match or analysis.scores.experience_relevance) >= 50 %}badge-warning{% else %}badge-danger{% endif %}">
+              {% if (analysis.scores.experience_match or analysis.scores.experience_relevance) >= 75 %}Aligned{% elif (analysis.scores.experience_match or analysis.scores.experience_relevance) >= 50 %}Partial{% else %}Needs Growth{% endif %}
+            </span>
+          </div>
+          <div class="metric-value"><span class="count-up" data-target="{{ analysis.scores.experience_match or analysis.scores.experience_relevance }}">0%</span></div>
+          <p class="metric-desc">Experience Relevance: {{ analysis.scores_explanation.experience_match if analysis.scores_explanation else 'How your work experience and background match what the employer asked for.' }}</p>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill {% if (analysis.scores.experience_match or analysis.scores.experience_relevance) >= 75 %}fill-success{% elif (analysis.scores.experience_match or analysis.scores.experience_relevance) >= 50 %}fill-warning{% else %}fill-danger{% endif %}" data-percent="{{ analysis.scores.experience_match or analysis.scores.experience_relevance }}" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- 4. Education Match -->
+      <div class="metric-card">
+        <div class="metric-card-content">
+          <div class="metric-header">
+            <div class="flex items-center gap-2">
+              <div class="metric-icon-box metric-icon-education">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                  <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                </svg>
+              </div>
+              <span class="metric-title">Education Match</span>
+            </div>
+            <span class="badge {% if (analysis.scores.education_match or 100) >= 75 %}badge-success{% elif (analysis.scores.education_match or 100) >= 50 %}badge-warning{% else %}badge-danger{% endif %}">
+              {% if (analysis.scores.education_match or 100) >= 75 %}Qualified{% elif (analysis.scores.education_match or 100) >= 50 %}Acceptable{% else %}Discipline Gap{% endif %}
+            </span>
+          </div>
+          <div class="metric-value"><span class="count-up" data-target="{{ analysis.scores.education_match or 100 }}">0%</span></div>
+          <p class="metric-desc">{{ analysis.scores_explanation.education_match if analysis.scores_explanation else 'Verification of degree level and field of study qualifications.' }}</p>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill {% if (analysis.scores.education_match or 100) >= 75 %}fill-success{% elif (analysis.scores.education_match or 100) >= 50 %}fill-warning{% else %}fill-danger{% endif %}" data-percent="{{ analysis.scores.education_match or 100 }}" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- 5. ATS Readiness Score -->
+      <div class="metric-card">
+        <div class="metric-card-content">
+          <div class="metric-header">
+            <div class="flex items-center gap-2">
+              <div class="metric-icon-box metric-icon-ats">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  <polyline points="9 12 11 14 15 10"></polyline>
+                </svg>
+              </div>
+              <span class="metric-title">ATS Readiness</span>
+            </div>
+            <span class="badge {% if (analysis.scores.ats_score or analysis.scores.ats_compatibility or 85) >= 80 %}badge-success{% elif (analysis.scores.ats_score or analysis.scores.ats_compatibility or 85) >= 65 %}badge-warning{% else %}badge-danger{% endif %}">
+              {% if (analysis.scores.ats_score or analysis.scores.ats_compatibility or 85) >= 80 %}ATS Ready{% elif (analysis.scores.ats_score or analysis.scores.ats_compatibility or 85) >= 65 %}Review Tips{% else %}Needs Fix{% endif %}
+            </span>
+          </div>
+          <div class="metric-value"><span class="count-up" data-target="{{ analysis.scores.ats_score or analysis.scores.ats_compatibility or 85 }}">0%</span></div>
+          <p class="metric-desc">ATS Compatibility: Applicant tracking system format and structure readability score.</p>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill {% if (analysis.scores.ats_score or analysis.scores.ats_compatibility or 85) >= 80 %}fill-success{% elif (analysis.scores.ats_score or analysis.scores.ats_compatibility or 85) >= 65 %}fill-warning{% else %}fill-danger{% endif %}" data-percent="{{ analysis.scores.ats_score or analysis.scores.ats_compatibility or 85 }}" style="width: 0%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if analysis.match_explanation %}
+  <!-- Match Explanation & Formula Rationale (Stage 4) -->
+  <div class="card" style="margin-bottom: 2rem; border-left: 4px solid var(--primary-600);">
+    <div class="card-header" style="padding: 1rem 1.5rem;">
+      <div class="flex items-center gap-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary-600);">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <h3 style="font-size: var(--text-base); margin-bottom: 0;">Match Explanation &amp; Score Rationale</h3>
+      </div>
+      <span class="badge badge-neutral" style="font-size: 0.75rem;">
+        Weighted Formula: 40% Skills • 25% Experience • 20% Keywords • 15% Education
+      </span>
+    </div>
+    <div class="card-body" style="padding: 1.25rem 1.5rem;">
+      <p style="font-size: var(--text-sm); line-height: 1.6; color: var(--text-main); margin-bottom: 0;">
+        {{ analysis.match_explanation }}
+      </p>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if analysis.parsed_resume %}
+  <!-- Real Parsed Resume Inspection (Stage 2) -->
+  <div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+      <div class="flex items-center gap-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary-600);">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <h3 style="font-size: var(--text-base); margin-bottom: 0;">Parsed Resume Inspection (Stage 2 Engine)</h3>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="badge badge-success">{{ analysis.parsed_resume.file_type }}</span>
+        <span class="badge badge-neutral">{{ analysis.parsed_resume.word_count }} words</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="flex items-center justify-between flex-wrap gap-2" style="margin-bottom: 1rem;">
+        <div class="flex items-center gap-2" style="font-size: var(--text-xs); color: var(--text-secondary);">
+          <strong>Document:</strong> {{ analysis.parsed_resume.filename }}
+          <span>•</span>
+          <span>{{ analysis.parsed_resume.char_count }} characters</span>
+          <span>•</span>
+          <span>{{ analysis.parsed_resume.sections_count }} of 8 common sections identified</span>
+        </div>
+        <button type="button" class="btn btn-outline btn-sm copy-parsed-text-btn" title="Copy raw extracted text">
+          Copy Extracted Text
+        </button>
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <div style="font-size: var(--text-xs); font-weight: var(--weight-bold); text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem;">
+          Detected Resume Sections
+        </div>
+        <div class="skill-chips-group">
+          {% for sec in analysis.parsed_resume.sections %}
+          <div class="skill-chip skill-matched">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>{{ sec }}</span>
+          </div>
+          {% endfor %}
+          {% for sec in analysis.parsed_resume.missing_sections %}
+          <div class="skill-chip skill-missing-optional">
+            <span style="opacity: 0.6;">―</span>
+            <span>{{ sec }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size: var(--text-xs); font-weight: var(--weight-bold); text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem;">
+          Extracted Text Preview
+        </div>
+        <pre class="extracted-text-content" style="max-height: 200px; overflow-y: auto; background-color: var(--bg-app); padding: 0.875rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">{{ analysis.parsed_resume.full_text }}</pre>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if analysis.job_analysis %}
+  <!-- Real Analyzed Job Description (Stage 3) -->
+  <div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+      <div class="flex items-center gap-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary-600);">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+        <h3 style="font-size: var(--text-base); margin-bottom: 0;">Analyzed Job Description (Stage 3 Engine)</h3>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="badge badge-success">{{ analysis.job_analysis.required_skills | length + analysis.job_analysis.preferred_skills | length }} Tech Skills</span>
+        <span class="badge badge-neutral">{{ analysis.job_analysis.word_count }} words</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="flex items-center justify-between flex-wrap gap-2" style="margin-bottom: 1.25rem;">
+        <div class="flex items-center gap-2" style="font-size: var(--text-xs); color: var(--text-secondary);">
+          <strong>Target Role:</strong> {{ analysis.job_analysis.job_title }}
+          <span>•</span>
+          <span>{{ analysis.job_analysis.char_count }} characters</span>
+          <span>•</span>
+          <span>{{ analysis.job_analysis.sections_detected | length }} JD sections detected</span>
+        </div>
+      </div>
+
+      <!-- Experience & Education Requirements Grid -->
+      <div class="jd-requirements-grid" style="margin-bottom: 1.25rem;">
+        <div class="jd-requirement-card">
+          <div class="flex items-center gap-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary-600);">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span class="jd-requirement-label">Experience Requirement</span>
+          </div>
+          <div class="jd-requirement-value">
+            {% if analysis.job_analysis.experience and analysis.job_analysis.experience.summary %}
+              {{ analysis.job_analysis.experience.summary }}
+              {% if analysis.job_analysis.experience.level %}
+                <span style="font-size: var(--text-xs); color: var(--text-muted); font-weight: normal;">({{ analysis.job_analysis.experience.level }})</span>
+              {% endif %}
+            {% else %}
+              Not explicitly specified
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="jd-requirement-card">
+          <div class="flex items-center gap-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary-600);">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+            </svg>
+            <span class="jd-requirement-label">Education Requirement</span>
+          </div>
+          <div class="jd-requirement-value">
+            {% if analysis.job_analysis.education and analysis.job_analysis.education.summary %}
+              {{ analysis.job_analysis.education.summary }}
+            {% else %}
+              Degree not explicitly specified
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Required Technical Skills -->
+      <div style="margin-bottom: 1.25rem;">
+        <div style="font-size: var(--text-xs); font-weight: var(--weight-bold); text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+          <div class="flex items-center gap-1">
+            <span style="color: var(--success-solid); font-weight: 700;">●</span>
+            <span>Required Technical Skills</span>
+          </div>
+          <span class="badge badge-success">{{ analysis.job_analysis.required_skills | length }}</span>
+        </div>
+        <div class="jd-tags-wrap">
+          {% for skill in analysis.job_analysis.required_skills %}
+          <span class="jd-tag-pill tag-required">{{ skill }}</span>
+          {% else %}
+          <span style="font-size: var(--text-xs); color: var(--text-muted); font-style: italic;">No specific technical skills extracted.</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Preferred / Nice-to-Have Skills -->
+      {% if analysis.job_analysis.preferred_skills %}
+      <div style="margin-bottom: 1.25rem;">
+        <div style="font-size: var(--text-xs); font-weight: var(--weight-bold); text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+          <div class="flex items-center gap-1">
+            <span style="color: var(--warning-solid); font-weight: 700;">●</span>
+            <span>Preferred / Nice-to-Have Skills</span>
+          </div>
+          <span class="badge badge-warning">{{ analysis.job_analysis.preferred_skills | length }}</span>
+        </div>
+        <div class="jd-tags-wrap">
+          {% for skill in analysis.job_analysis.preferred_skills %}
+          <span class="jd-tag-pill tag-preferred">{{ skill }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Soft Skills -->
+      {% if analysis.job_analysis.soft_skills %}
+      <div style="margin-bottom: 1.25rem;">
+        <div style="font-size: var(--text-xs); font-weight: var(--weight-bold); text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+          <div class="flex items-center gap-1">
+            <span style="color: var(--info-solid); font-weight: 700;">●</span>
+            <span>Soft Skills & Professional Attributes</span>
+          </div>
+          <span class="badge badge-info">{{ analysis.job_analysis.soft_skills | length }}</span>
+        </div>
+        <div class="jd-tags-wrap">
+          {% for skill in analysis.job_analysis.soft_skills %}
+          <span class="jd-tag-pill tag-soft">{{ skill }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Important Domain Keywords -->
+      {% if analysis.job_analysis.keywords %}
+      <div>
+        <div style="font-size: var(--text-xs); font-weight: var(--weight-bold); text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+          <span>Important Keywords</span>
+          <span class="badge badge-neutral">{{ analysis.job_analysis.keywords | length }} keywords</span>
+        </div>
+        <div class="jd-tags-wrap">
+          {% for kw in analysis.job_analysis.keywords %}
+          <span class="jd-tag-pill tag-keyword">
+            <span>{{ kw.keyword }}</span>
+            <span class="jd-keyword-freq">{{ kw.count }}x</span>
+          </span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Skills Breakdown Grid (Matched vs Missing) -->
+  <div class="analysis-sections-grid">
+    <!-- Left: Matched Skills -->
+    <div class="card">
+      <div class="card-header">
+        <div class="flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--success-solid);">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <h3 style="font-size: var(--text-base); margin-bottom: 0;">Matched Skills ({{ analysis.matched_skills | length }})</h3>
+        </div>
+        <span class="badge badge-success">Verified in Resume</span>
+      </div>
+
+      <div class="card-body">
+        <p style="font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 1.25rem;">
+          Skills found on your resume that match what the employer asked for.
+        </p>
+
+        <div class="skill-chips-group">
+          {% for skill in analysis.matched_skills %}
+          <div class="skill-chip skill-matched" data-skill-name="{{ skill.name }}" data-skill-category="{{ skill.category }}">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>{{ skill.name }}</span>
+            {% if skill.match_type == 'related' %}
+            <span class="badge badge-warning" style="font-size: 0.625rem; padding: 0.1rem 0.4rem;" title="{{ skill.matched_via }}">Related ({{ skill.matched_via }})</span>
+            {% else %}
+            <span class="chip-tag">{{ skill.category or 'Exact Match' }}</span>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Missing Skills (Required vs Preferred) -->
+    <div class="card">
+      <div class="card-header">
+        <div class="flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--danger-solid);">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <h3 style="font-size: var(--text-base); margin-bottom: 0;">Missing Skills & Gaps ({{ (analysis.missing_required_skills | length + analysis.missing_preferred_skills | length) if (analysis.missing_required_skills or analysis.missing_preferred_skills) else (analysis.missing_skills | length) }})</h3>
+        </div>
+        <span class="badge badge-danger">Action Required</span>
+      </div>
+
+      <div class="card-body">
+        <p style="font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 1.25rem;">
+          Requirements from the job posting that weren't found on your resume.
+        </p>
+
+        {% if analysis.missing_required_skills %}
+        <div style="margin-bottom: 1.25rem;">
+          <div style="font-size: var(--text-xs); font-weight: var(--weight-bold); text-transform: uppercase; color: var(--danger-text); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+            <div class="flex items-center gap-1">
+              <span style="color: var(--danger-solid);">●</span>
+              <span>Missing Required Skills</span>
+            </div>
+            <span class="badge badge-danger">{{ analysis.missing_required_skills | length }} Critical</span>
+          </div>
+          <div class="missing-skills-list">
+            {% for item in analysis.missing_required_skills %}
+            <div class="missing-skill-item" style="border-left: 3px solid var(--danger-solid);">
+              <div class="missing-skill-top">
+                <div class="flex items-center gap-2">
+                  <span class="missing-skill-name">{{ item.name }}</span>
+                  <span class="badge badge-neutral" style="font-size: 0.65rem;">{{ item.category }}</span>
+                  <span class="badge badge-danger" style="font-size: 0.65rem;">Priority: {{ item.priority or 'High' }}</span>
+                </div>
+                <span class="badge badge-danger">Required</span>
+              </div>
+              <div class="missing-skill-desc" style="margin-bottom: 0.35rem;">
+                <strong>Why it matters:</strong> {{ item.why_it_matters or item.impact }}
+              </div>
+              {% if item.suggested_learning_direction %}
+              <div style="font-size: var(--text-xs); color: var(--primary-600); background-color: var(--bg-surface); padding: 0.35rem 0.5rem; border-radius: var(--radius-sm); border-left: 2px solid var(--primary-600);">
+                <strong>Learning Direction:</strong> {{ item.suggested_learning_direction }}
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        {% if analysis.missing_preferred_skills %}
+        <div>
+          <div style="font-size: var(--text-xs); font-weight: var(--weight-bold); text-transform: uppercase; color: var(--warning-text); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+            <div class="flex items-center gap-1">
+              <span style="color: var(--warning-solid);">●</span>
+              <span>Missing Preferred Skills</span>
+            </div>
+            <span class="badge badge-warning">{{ analysis.missing_preferred_skills | length }} Bonus</span>
+          </div>
+          <div class="missing-skills-list">
+            {% for item in analysis.missing_preferred_skills %}
+            <div class="missing-skill-item" style="border-left: 3px solid var(--warning-solid);">
+              <div class="missing-skill-top">
+                <div class="flex items-center gap-2">
+                  <span class="missing-skill-name">{{ item.name }}</span>
+                  <span class="badge badge-neutral" style="font-size: 0.65rem;">{{ item.category }}</span>
+                  <span class="badge badge-warning" style="font-size: 0.65rem;">Priority: {{ item.priority or 'Medium' }}</span>
+                </div>
+                <span class="badge badge-warning">Preferred / Bonus</span>
+              </div>
+              <div class="missing-skill-desc" style="margin-bottom: 0.35rem;">
+                <strong>Why it matters:</strong> {{ item.why_it_matters or item.impact }}
+              </div>
+              {% if item.suggested_learning_direction %}
+              <div style="font-size: var(--text-xs); color: var(--warning-solid); background-color: var(--bg-surface); padding: 0.35rem 0.5rem; border-radius: var(--radius-sm); border-left: 2px solid var(--warning-solid);">
+                <strong>Learning Direction:</strong> {{ item.suggested_learning_direction }}
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% elif not analysis.missing_required_skills and analysis.missing_skills %}
+        <div class="missing-skills-list">
+          {% for item in analysis.missing_skills %}
+          <div class="missing-skill-item">
+            <div class="missing-skill-top">
+              <div class="flex items-center gap-2">
+                <span class="missing-skill-name">{{ item.name }}</span>
+                <span class="badge badge-neutral" style="font-size: 0.65rem;">{{ item.category }}</span>
+              </div>
+              {% if item.priority == 'critical' %}
+              <span class="badge badge-danger">Critical Gap</span>
+              {% elif item.priority == 'recommended' %}
+              <span class="badge badge-warning">Recommended</span>
+              {% else %}
+              <span class="badge badge-neutral">Optional</span>
+              {% endif %}
+            </div>
+            <div class="missing-skill-desc">
+              {{ item.impact }} • Mentioned {{ item.frequency_in_jd }}x in JD
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if analysis.weak_matches or analysis.partially_satisfied_requirements %}
+  <!-- Weak Matches & Skill Transferability Grid (Stage 5) -->
+  <div class="analysis-sections-grid" style="margin-bottom: 2rem;">
+    <!-- Left: Weak / Low-Confidence Matches -->
+    <div class="card">
+      <div class="card-header">
+        <div class="flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--warning-solid);">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <h3 style="font-size: var(--text-base); margin-bottom: 0;">Weak &amp; Low-Confidence Matches ({{ analysis.weak_matches | length if analysis.weak_matches else 0 }})</h3>
+        </div>
+        <span class="badge badge-warning">Needs Reinforcement</span>
+      </div>
+      <div class="card-body">
+        <p style="font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 1.25rem;">
+          Skills that matched through related tools, or are listed without supporting project details.
+        </p>
+        <div class="missing-skills-list">
+          {% for wm in analysis.weak_matches %}
+          <div class="missing-skill-item" style="border-left: 3px solid var(--warning-solid);">
+            <div class="missing-skill-top">
+              <div class="flex items-center gap-2">
+                <span class="missing-skill-name">{{ wm.name }}</span>
+                <span class="badge badge-neutral" style="font-size: 0.65rem;">{{ wm.relevance }}</span>
+                <span class="badge badge-warning" style="font-size: 0.65rem;">Confidence: {{ wm.confidence_score }}%</span>
+              </div>
+              <span class="badge badge-warning">{{ wm.matched_via }}</span>
+            </div>
+            <div class="missing-skill-desc" style="margin-bottom: 0.35rem;">
+              <strong>Why it's flagged:</strong> {{ wm.why_weak }}
+            </div>
+            <div style="font-size: var(--text-xs); color: var(--text-secondary); background-color: var(--bg-surface); padding: 0.35rem 0.5rem; border-radius: var(--radius-sm);">
+              <strong>How to improve:</strong> {{ wm.suggested_improvement }}
+            </div>
+          </div>
+          {% else %}
+          <div style="padding: 1rem; text-align: center; color: var(--success-text); font-size: var(--text-xs);">
+            All matched skills have strong, verified evidence in your resume.
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Related Skills Satisfying Requirements (Transferability) -->
+    <div class="card">
+      <div class="card-header">
+        <div class="flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary-600);">
+            <polyline points="16 3 21 3 21 8"></polyline>
+            <line x1="4" y1="20" x2="21" y2="3"></line>
+            <polyline points="21 16 21 21 16 21"></polyline>
+            <line x1="15" y1="15" x2="21" y2="21"></line>
+            <line x1="4" y1="4" x2="9" y2="9"></line>
+          </svg>
+          <h3 style="font-size: var(--text-base); margin-bottom: 0;">Skill Transferability &amp; Bridges ({{ analysis.partially_satisfied_requirements | length if analysis.partially_satisfied_requirements else 0 }})</h3>
+        </div>
+        <span class="badge badge-success">Transferable Strengths</span>
+      </div>
+      <div class="card-body">
+        <p style="font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 1.25rem;">
+          Skills you have that closely overlap with what the role asks for.
+        </p>
+        <div class="missing-skills-list">
+          {% for bridge in analysis.partially_satisfied_requirements %}
+          <div class="missing-skill-item" style="border-left: 3px solid var(--primary-600);">
+            <div class="missing-skill-top">
+              <div class="flex items-center gap-2">
+                <span class="missing-skill-name">{{ bridge.target_skill }}</span>
+                <span class="badge badge-neutral" style="font-size: 0.65rem;">via {{ bridge.candidate_skill }}</span>
+              </div>
+              <span class="badge badge-info">{{ bridge.satisfaction_level }}</span>
+            </div>
+            <div class="missing-skill-desc" style="margin-bottom: 0.35rem;">
+              <strong>What carries over:</strong> {{ bridge.transferable_concepts }}
+            </div>
+            <div class="missing-skill-desc" style="margin-bottom: 0.35rem; color: var(--text-muted);">
+              <strong>What to learn:</strong> {{ bridge.delta_to_bridge }}
+            </div>
+            <div style="font-size: var(--text-xs); color: var(--text-secondary); background-color: var(--bg-surface); padding: 0.35rem 0.5rem; border-radius: var(--radius-sm);">
+              <strong>How to explain it:</strong> {{ bridge.interview_strategy }}
+            </div>
+          </div>
+          {% else %}
+          <div style="padding: 1rem; text-align: center; color: var(--text-muted); font-size: var(--text-xs);">
+            No related skill bridges found. Each requirement is either already matched or is a completely new skill.
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if analysis.matched_keywords or analysis.missing_keywords %}
+  <!-- Keyword Correlation Grid (Stage 4) -->
+  <div class="analysis-sections-grid">
+    <!-- Left: Matched Keywords -->
+    <div class="card">
+      <div class="card-header">
+        <div class="flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--success-solid);">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <h3 style="font-size: var(--text-base); margin-bottom: 0;">Matched Keywords ({{ analysis.matched_keywords | length }})</h3>
+        </div>
+        <span class="badge badge-success">Present in Resume</span>
+      </div>
+      <div class="card-body">
+        <p style="font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 1.25rem;">
+          Important terms from the job posting found in your resume.
+        </p>
+        <div class="jd-tags-wrap">
+          {% for kw in analysis.matched_keywords %}
+          <span class="jd-tag-pill tag-required">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>{{ kw.keyword }}</span>
+            {% if kw.frequency_in_resume %}
+            <span class="jd-keyword-freq" title="Occurrences in resume">{{ kw.frequency_in_resume }}x in resume</span>
+            {% endif %}
+          </span>
+          {% else %}
+          <span style="font-size: var(--text-xs); color: var(--text-muted); font-style: italic;">No matching domain keywords detected.</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Missing Keywords -->
+    <div class="card">
+      <div class="card-header">
+        <div class="flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--danger-solid);">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <h3 style="font-size: var(--text-base); margin-bottom: 0;">Missing Keywords ({{ analysis.missing_keywords | length }})</h3>
+        </div>
+        <span class="badge badge-warning">Keywords to Add</span>
+      </div>
+      <div class="card-body">
+        <p style="font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 1.25rem;">
+          Key terms from the job posting that aren't mentioned in your resume yet.
+        </p>
+        <div class="jd-tags-wrap">
+          {% for kw in analysis.missing_keywords %}
+          <span class="jd-tag-pill tag-preferred">
+            <span style="opacity: 0.6;">―</span>
+            <span>{{ kw.keyword }}</span>
+            <span class="jd-keyword-freq" title="Frequency in job description">{{ kw.count_in_jd or 1 }}x in JD</span>
+          </span>
+          {% else %}
+          <span style="font-size: var(--text-xs); color: var(--success-text); font-style: italic;">All target domain keywords are represented.</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Detailed Sections: Resume Improvement & ATS Checks -->
+  <div class="analysis-sections-grid">
+    <!-- Actionable Resume Improvements -->
+    <div class="card">
+      <div class="card-header">
+        <div class="flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary-600);">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+          <h3 style="font-size: var(--text-base); margin-bottom: 0;">Resume Improvement Suggestions</h3>
+        </div>
+        <span class="badge badge-neutral">{{ analysis.improvement_suggestions | length }} Tips</span>
+      </div>
+
+      <div class="card-body">
+        <div class="suggestions-list">
+          {% for sug in analysis.improvement_suggestions %}
+          <div class="suggestion-card">
+            <div class="suggestion-topbar">
+              <div class="flex items-center gap-2">
+                <span class="suggestion-title">{{ sug.title }}</span>
+                {% if sug.type == 'high' %}
+                <span class="badge badge-danger">High Impact</span>
+                {% else %}
+                <span class="badge badge-warning">Medium Impact</span>
+                {% endif %}
+              </div>
+              <button type="button" class="btn btn-outline btn-sm copy-suggestion-btn" title="Copy suggestion text">
+                Copy
+              </button>
+            </div>
+            <p class="suggestion-desc">{{ sug.description }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- ATS Verification Checklist -->
+    <div class="card">
+      <div class="card-header">
+        <div class="flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--info-solid);">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <h3 style="font-size: var(--text-base); margin-bottom: 0;">ATS Compatibility Audit</h3>
+        </div>
+        <span class="badge {% if (analysis.scores.ats_score or 85) >= 80 %}badge-success{% elif (analysis.scores.ats_score or 85) >= 65 %}badge-warning{% else %}badge-danger{% endif %}">{{ analysis.scores.ats_score or 85 }}% Compatibility Score</span>
+      </div>
+
+      <div class="card-body">
+        <p style="font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 1.25rem;">
+          Checks whether applicant tracking systems (ATS) can parse your text, layout, and contact details without errors.
+        </p>
+
+        <div class="ats-check-list">
+          {% for check in analysis.ats_checklist %}
+          <div class="ats-check-row">
+            <div class="ats-check-info">
+              {% if check.status == 'pass' %}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--success-solid); flex-shrink: 0;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              {% elif check.status == 'warning' %}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--warning-solid); flex-shrink: 0;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              {% else %}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--danger-solid); flex-shrink: 0;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+              </svg>
+              {% endif %}
+              <div>
+                <div class="ats-check-title">{{ check.title }}</div>
+                <div class="ats-check-desc">{{ check.details }}</div>
+                {% if check.recommendation and check.status != 'pass' %}
+                <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: 0.25rem;">
+                  <strong>Recommended:</strong> {{ check.recommendation }}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            {% if check.status == 'pass' %}
+            <span class="badge badge-success">Passed</span>
+            {% elif check.status == 'warning' %}
+            <span class="badge badge-warning">Review</span>
+            {% else %}
+            <span class="badge badge-danger">Failed</span>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+
+        {% if analysis.formatting_issues %}
+        <div style="margin-top: 1.25rem; padding: 0.75rem 1rem; background-color: var(--bg-surface); border-radius: var(--radius-sm); border-left: 3px solid var(--warning-solid);">
+          <div style="font-size: var(--text-xs); font-weight: var(--weight-bold); color: var(--warning-text); margin-bottom: 0.35rem;">
+            Document Formatting Observations:
+          </div>
+          <ul style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: 0; padding-left: 1.25rem;">
+            {% for issue in analysis.formatting_issues %}
+            <li>{{ issue }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Personalized Career Learning Roadmap Section (Stage 6) -->
+  <div class="card" style="margin-top: 1.5rem;">
+    <div class="card-header">
+      <div class="flex items-center gap-2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary-600);">
+          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+          <line x1="8" y1="2" x2="8" y2="18"></line>
+          <line x1="16" y1="6" x2="16" y2="22"></line>
+        </svg>
+        <div>
+          <h3 style="font-size: var(--text-base); margin-bottom: 0;">Personalized Career Roadmap</h3>
+          <span style="font-size: var(--text-xs); color: var(--text-muted);">Personalized Skill Gap Closure Roadmap • Stage 6 Engine</span>
+        </div>
+      </div>
+      <span class="badge badge-primary">3 Sequential Phases</span>
+    </div>
+
+    <div class="card-body">
+      {% set p_roadmap = analysis.personalized_roadmap %}
+      {% if p_roadmap %}
+        <!-- "Why this roadmap?" Explanation -->
+        <div class="roadmap-why-box">
+          <div class="roadmap-why-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>Why this roadmap?</span>
+          </div>
+          <p class="roadmap-why-text">{{ p_roadmap.why_this_roadmap }}</p>
+          <div class="roadmap-disclaimer">{{ p_roadmap.disclaimer }}</div>
+        </div>
+
+        <!-- "Recommended Next Step" Top Card -->
+        {% set next_step = p_roadmap.recommended_next_step %}
+        {% if next_step %}
+        <div class="roadmap-next-step-card">
+          <div class="roadmap-next-topbar">
+            <div class="roadmap-next-badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>Recommended Next Step • Priority #1</span>
+            </div>
+            <div class="flex items-center gap-1">
+              {% if next_step.priority == 'High' %}
+              <span class="badge badge-danger">High Priority</span>
+              {% elif next_step.priority == 'Medium' %}
+              <span class="badge badge-warning">Medium Priority</span>
+              {% else %}
+              <span class="badge badge-neutral">Low Priority</span>
+              {% endif %}
+
+              {% if next_step.current_status == 'Related skill found' %}
+              <span class="badge badge-warning">Related skill found</span>
+              {% elif next_step.current_status == 'Weak' %}
+              <span class="badge badge-warning">Weak Match</span>
+              {% else %}
+              <span class="badge badge-danger">Missing</span>
+              {% endif %}
+
+              <span class="badge badge-info">Level: {{ next_step.recommended_level }}</span>
+            </div>
+          </div>
+
+          <div class="roadmap-next-headline">{{ next_step.headline }}</div>
+          <p style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: 0.5rem; line-height: 1.5;">
+            <strong>Why start here:</strong> {{ next_step.why }}
+          </p>
+
+          <div class="roadmap-next-action-box">
+            <div style="font-size: var(--text-xs); font-weight: var(--weight-bold); color: var(--primary-700); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.35rem;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="9 11 12 14 22 4"></polyline>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
+              <span>Immediate First Action (Est. {{ next_step.estimated_effort }}):</span>
+            </div>
+            <div style="font-size: var(--text-xs); color: var(--text-main); font-family: var(--font-sans);">
+              {{ next_step.immediate_action }}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- 3 Sequential Phases -->
+        {% for phase in p_roadmap.phases %}
+        <div class="roadmap-phase-section">
+          <div class="roadmap-phase-header-bar">
+            <div>
+              <div class="roadmap-phase-name">{{ phase.phase_name }}</div>
+              <div class="roadmap-phase-desc">{{ phase.description }}</div>
+            </div>
+            <span class="badge {{ phase.badge_class }}">{{ phase.skill_count }} {% if phase.skill_count == 1 %}Skill{% else %}Skills{% endif %}</span>
+          </div>
+
+          <div class="roadmap-skill-cards">
+            {% for skill in phase.skills %}
+            <div class="roadmap-card">
+              <div class="roadmap-card-top">
+                <div class="flex items-center gap-2">
+                  <div class="roadmap-step-pill">{{ skill.suggested_sequence }}</div>
+                  <div>
+                    <div class="roadmap-card-skill-name">{{ skill.skill_name }}</div>
+                    <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">{{ skill.category }}</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1 flex-wrap">
+                  {% if skill.priority == 'High' %}
+                  <span class="badge badge-danger">High Priority</span>
+                  {% elif skill.priority == 'Medium' %}
+                  <span class="badge badge-warning">Medium Priority</span>
+                  {% else %}
+                  <span class="badge badge-neutral">Low Priority</span>
+                  {% endif %}
+
+                  {% if skill.current_status == 'Related skill found' %}
+                  <span class="badge badge-warning">Related skill found</span>
+                  {% elif skill.current_status == 'Weak' %}
+                  <span class="badge badge-warning">Weak Match</span>
+                  {% else %}
+                  <span class="badge badge-danger">Missing</span>
+                  {% endif %}
+
+                  <span class="badge badge-info">Level: {{ skill.recommended_level }}</span>
+                  <span class="badge badge-neutral">{{ skill.estimated_effort }}</span>
+                </div>
+              </div>
+
+              <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: 0.5rem; line-height: 1.5;">
+                <strong>Why Recommended:</strong> {{ skill.reason }}
+              </div>
+
+              {% if skill.prerequisite_bridge and skill.prerequisite_bridge.has_bridge %}
+              <div class="roadmap-bridge-box">
+                <div style="font-weight: 700; color: var(--warning-text); margin-bottom: 0.2rem;">
+                  Adjacent Competency Bridge:
+                </div>
+                <div style="color: var(--text-secondary);">
+                  <strong>Transferable concepts from {{ skill.prerequisite_bridge.candidate_skill }}:</strong> {{ skill.prerequisite_bridge.transferable_concepts }}
+                </div>
+                <div style="color: var(--text-muted); margin-top: 0.15rem;">
+                  <strong>Delta to bridge:</strong> {{ skill.prerequisite_bridge.delta_to_bridge }}
+                </div>
+              </div>
+              {% endif %}
+
+              <!-- Concrete Actionable Steps -->
+              <ul class="roadmap-steps-list">
+                {% for step in skill.learning_steps %}
+                <li>
+                  <span class="roadmap-step-num">{{ loop.index }}</span>
+                  <span>{{ step }}</span>
+                </li>
+                {% endfor %}
+              </ul>
+
+              {% if skill.official_reference %}
+              <div class="roadmap-resource" style="margin-top: 0.5rem; padding-top: 0.5rem;">
+                <strong>Vetted Reference:</strong> {{ skill.official_reference }}
+              </div>
+              {% endif %}
+            </div>
+            {% else %}
+            <div style="padding: 1rem; text-align: center; color: var(--text-muted); font-size: var(--text-xs); background-color: var(--bg-surface-alt); border-radius: var(--radius-md);">
+              No skills currently assigned to this phase.
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+
+      {% else %}
+        <!-- Backward-compatible rendering for legacy Stage 5 roadmap payload -->
+        <p style="font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 2rem;">
+          Follow this structured study sequence to close critical and recommended gaps before your next interview round.
+        </p>
+
+        <div class="roadmap-timeline">
+          {% for phase in analysis.learning_roadmap %}
+          <div class="roadmap-item">
+            <div class="roadmap-node"></div>
+            <div class="roadmap-header">
+              <div>
+                <span class="badge badge-info" style="margin-bottom: 0.25rem;">Phase {{ phase.phase }} • {{ phase.duration_weeks }} (Est. {{ phase.estimated_hours }}h)</span>
+                <div class="roadmap-phase-title">{{ phase.phase_title }}</div>
+              </div>
+              <span class="badge badge-neutral">{{ phase.target_skill }}</span>
+            </div>
+
+            <ul class="roadmap-milestones">
+              {% for milestone in phase.milestones %}
+              <li>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--primary-600); flex-shrink: 0;">
+                  <polyline points="9 11 12 14 22 4"></polyline>
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                </svg>
+                <span>{{ milestone }}</span>
+              </li>
+              {% endfor %}
+            </ul>
+
+            <div class="roadmap-resource">
+              <strong>Recommended Vetted Resource:</strong> {{ phase.recommended_resource }}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

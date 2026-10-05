@@ -1,0 +1,406 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/analyzer.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container section-sm">
+  <!-- Page Header -->
+  <div class="analyzer-header">
+    <div class="flex items-center gap-2" style="font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 0.5rem;">
+      <a href="{{ url_for('main.index') }}" style="color: var(--text-muted);">Home</a>
+      <span>/</span>
+      <span style="color: var(--text-main);">Resume Analyzer</span>
+    </div>
+    <h1>Check how well your resume fits the job</h1>
+    <p>
+      Upload your resume and paste the job description below. We'll show you which skills match, what you're missing, and what to tweak before sending your application.
+    </p>
+  </div>
+
+  <!-- Main Analysis Workspace -->
+  <form id="analyzer-form" autocomplete="off" onsubmit="return false;">
+    <div class="analyzer-grid">
+      <!-- Left Column: Resume Upload -->
+      <div class="card">
+        <div class="card-header">
+          <div class="flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary-600);">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <h3 style="font-size: var(--text-base); margin-bottom: 0;">1. Your Resume</h3>
+          </div>
+          <span class="badge badge-neutral">Step 1</span>
+        </div>
+
+        <div class="card-body">
+          <!-- Dropzone -->
+          <div id="resume-dropzone" class="dropzone {% if active_resume %}has-file{% endif %}" tabindex="0" role="button" aria-label="Upload resume file" {% if active_resume %}style="display: none;"{% endif %}>
+            <input type="file" id="resume-file-input" name="resume" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display: none;">
+            
+            <div class="dropzone-icon-box">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
+
+            <div class="dropzone-title">Drop your resume here, or click to browse</div>
+            <div class="dropzone-subtitle">Supported formats: PDF or DOCX (Max 5 MB)</div>
+
+            <div class="format-tags">
+              <span class="badge badge-neutral">.PDF</span>
+              <span class="badge badge-neutral">.DOCX</span>
+              <span class="badge badge-neutral">Max 5 MB</span>
+            </div>
+          </div>
+
+          <!-- Selected File Pill (Shown after file selection or if active in session) -->
+          <div id="selected-file-pill" class="selected-file-pill {% if active_resume %}is-active{% endif %}">
+            <div class="file-info-group">
+              <div class="file-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+              </div>
+              <div>
+                <div id="selected-file-name" class="file-name">{{ active_resume.filename if active_resume else 'My_Resume.pdf' }}</div>
+                <div id="selected-file-size" class="file-meta">
+                  {% if active_resume %}
+                    {{ active_resume.file_size_kb }} KB • Active resume
+                  {% else %}
+                    145 KB
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <button type="button" id="remove-file-btn" class="file-remove-btn" title="Change or remove resume" aria-label="Change uploaded resume">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <!-- File Validation Error Message Area -->
+          <div id="file-validation-msg" class="callout callout-warning" style="display: none; margin-top: 1rem; margin-bottom: 0;"></div>
+
+          <!-- Parsed Resume Feedback & Real Text Preview Area (Stage 2) -->
+          <div id="parsed-resume-container" class="parsed-resume-container">
+            <!-- Success Message Banner -->
+            <div id="parse-success-banner" class="callout callout-success flex items-center justify-between" style="margin-bottom: 0;">
+              <div class="flex items-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--success-solid); flex-shrink: 0;">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span id="parse-success-msg" style="font-weight: var(--weight-medium);">Resume parsed successfully!</span>
+              </div>
+              <span id="parsed-filetype-badge" class="badge badge-success">PDF</span>
+            </div>
+
+            <!-- Metadata Stats Bar -->
+            <div class="parsed-meta-row">
+              <div class="flex items-center gap-3">
+                <span style="font-size: var(--text-xs); color: var(--text-muted);">Extracted Stats:</span>
+                <span id="parsed-char-count" class="badge badge-neutral">0 chars</span>
+                <span id="parsed-word-count" class="badge badge-neutral">0 words</span>
+              </div>
+              <div id="parsed-contact-summary" style="font-size: var(--text-xs); color: var(--text-secondary);"></div>
+            </div>
+
+            <!-- Detected Resume Sections -->
+            <div class="detected-sections-box">
+              <div class="detected-sections-title">
+                <span>Detected Resume Sections</span>
+                <span id="detected-sections-counter" class="badge badge-neutral">0 / 8</span>
+              </div>
+              <div id="detected-sections-list" class="detected-sections-list">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Extracted Text Preview -->
+            <div class="extracted-text-card">
+              <div class="extracted-text-header">
+                <div class="extracted-text-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="21" y1="10" x2="3" y2="10"></line>
+                    <line x1="21" y1="6" x2="3" y2="6"></line>
+                    <line x1="21" y1="14" x2="3" y2="14"></line>
+                    <line x1="21" y1="18" x2="3" y2="18"></line>
+                  </svg>
+                  <span>Extracted Text Preview</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button type="button" id="copy-extracted-text-btn" class="btn btn-outline btn-sm" title="Copy raw extracted text">
+                    Copy Text
+                  </button>
+                  <button type="button" id="toggle-full-text-btn" class="btn btn-outline btn-sm">
+                    Expand
+                  </button>
+                </div>
+              </div>
+              <div id="extracted-text-wrapper" class="extracted-text-body">
+                <pre id="extracted-text-view" class="extracted-text-content"></pre>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; font-size: var(--text-xs); color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Your resume stays private in your account. We never share or sell your data.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Target Job Details -->
+      <div class="card">
+        <div class="card-header">
+          <div class="flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary-600);">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            <h3 style="font-size: var(--text-base); margin-bottom: 0;">2. Target Job Description</h3>
+          </div>
+          <span class="badge badge-neutral">Step 2</span>
+        </div>
+
+        <div class="card-body">
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Job Title -->
+            <div class="form-group">
+              <label for="job-title-input" class="form-label">
+                <span>Job Title <span style="color: var(--danger-solid);">*</span></span>
+              </label>
+              <input type="text" id="job-title-input" name="job_title" class="form-input" placeholder="e.g. Senior Full Stack Engineer" value="Senior Full Stack Software Engineer" required>
+            </div>
+
+            <!-- Target Company -->
+            <div class="form-group">
+              <label for="company-input" class="form-label">
+                <span>Company</span>
+                <span class="form-label-optional">Optional</span>
+              </label>
+              <input type="text" id="company-input" name="company" class="form-input" placeholder="e.g. Starlight Technologies" value="Starlight Technologies">
+            </div>
+          </div>
+
+          <!-- Job Description Editor -->
+          <div class="form-group" style="margin-bottom: 0;">
+            <div class="jd-toolbar">
+              <label for="job-description-input" class="form-label" style="margin-bottom: 0;">
+                <span>Job Description <span style="color: var(--danger-solid);">*</span></span>
+              </label>
+
+              <!-- Quick Fill Presets -->
+              <div class="quick-fill-group">
+                <span style="font-size: var(--text-xs); color: var(--text-muted);">Sample roles:</span>
+                <button type="button" class="quick-fill-btn" data-role="fullstack">Full Stack</button>
+                <button type="button" class="quick-fill-btn" data-role="frontend">Frontend</button>
+                <button type="button" class="quick-fill-btn" data-role="devops">DevOps</button>
+              </div>
+            </div>
+
+            <textarea id="job-description-input" name="job_description" class="form-textarea" placeholder="Paste the job description, requirements, and responsibilities here..." required>About the Role:
+We are seeking an experienced Senior Full Stack Software Engineer to lead development of our distributed cloud web platform. You will collaborate with product designers, backend engineers, and DevOps to deliver reliable, high-performance web applications.
+
+Responsibilities:
+- Architect, build, and maintain scalable user interfaces using modern React and TypeScript.
+- Design resilient RESTful microservices and backend data pipelines in Python (Flask/FastAPI) and SQL.
+- Implement robust caching layers using Redis and manage messaging queues.
+- Deploy and monitor microservices in containerized environments with Docker and Kubernetes (K8s).
+- Write comprehensive unit, integration, and end-to-end tests; champion CI/CD best practices.
+
+Requirements:
+- 4+ years of production experience in full-stack web development.
+- Deep proficiency in JavaScript/TypeScript, modern React, and Python or Node.js.
+- Strong fundamentals in relational databases (PostgreSQL/MySQL) and query optimization.
+- Working knowledge of containerization (Docker) and Kubernetes orchestration.
+- Familiarity with modern API paradigms including REST and GraphQL.
+- Excellent communication skills and passion for mentorship in an agile environment.</textarea>
+
+            <div class="flex items-center justify-between" style="margin-top: 0.5rem;">
+              <span class="form-hint">Tip: Pasting the full job posting gives you the most accurate match.</span>
+              <div class="flex items-center gap-3">
+                <span id="jd-word-count" class="word-count-badge">0 words • 0 chars</span>
+                <button type="button" id="analyze-jd-btn" class="btn btn-secondary btn-sm" title="Analyze job description text directly">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <span>Check Requirements</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Job Description Validation Error Message Area -->
+            <div id="jd-validation-msg" class="callout callout-warning" style="display: none; margin-top: 1rem; margin-bottom: 0;"></div>
+
+            <!-- Extracted Job Description Requirements (Stage 3) -->
+            <div id="analyzed-jd-container" class="analyzed-jd-container">
+              <!-- Success Banner -->
+              <div id="jd-analysis-banner" class="callout callout-info flex items-center justify-between" style="margin-bottom: 0;">
+                <div class="flex items-center gap-2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--info-solid); flex-shrink: 0;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span id="jd-analysis-msg" style="font-weight: var(--weight-medium);">Job Description analyzed successfully!</span>
+                </div>
+                <span id="jd-skills-count-badge" class="badge badge-info">0 Skills Detected</span>
+              </div>
+
+              <!-- Experience & Education Requirements Grid -->
+              <div class="jd-requirements-grid">
+                <div class="jd-requirement-card">
+                  <div class="flex items-center gap-1">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary-600);">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span class="jd-requirement-label">Experience Requirement</span>
+                  </div>
+                  <div id="jd-experience-val" class="jd-requirement-value">Not specified</div>
+                </div>
+
+                <div class="jd-requirement-card">
+                  <div class="flex items-center gap-1">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary-600);">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                      <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                    </svg>
+                    <span class="jd-requirement-label">Education Requirement</span>
+                  </div>
+                  <div id="jd-education-val" class="jd-requirement-value">Degree not specified</div>
+                </div>
+              </div>
+
+              <!-- Required Technical Skills -->
+              <div id="jd-required-skills-block" class="jd-section-block">
+                <div class="jd-section-header">
+                  <div class="flex items-center gap-2">
+                    <span style="color: var(--success-solid); font-weight: 700;">●</span>
+                    <span>Required Technical Skills</span>
+                  </div>
+                  <span id="jd-required-counter" class="badge badge-success">0</span>
+                </div>
+                <div id="jd-required-skills-list" class="jd-tags-wrap">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
+
+              <!-- Preferred / Nice-to-Have Skills -->
+              <div id="jd-preferred-skills-block" class="jd-section-block" style="display: none;">
+                <div class="jd-section-header">
+                  <div class="flex items-center gap-2">
+                    <span style="color: var(--warning-solid); font-weight: 700;">●</span>
+                    <span>Preferred / Nice-to-Have Skills</span>
+                  </div>
+                  <span id="jd-preferred-counter" class="badge badge-warning">0</span>
+                </div>
+                <div id="jd-preferred-skills-list" class="jd-tags-wrap">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
+
+              <!-- Soft Skills -->
+              <div id="jd-soft-skills-block" class="jd-section-block" style="display: none;">
+                <div class="jd-section-header">
+                  <div class="flex items-center gap-2">
+                    <span style="color: var(--info-solid); font-weight: 700;">●</span>
+                    <span>Soft Skills & Professional Attributes</span>
+                  </div>
+                  <span id="jd-soft-counter" class="badge badge-info">0</span>
+                </div>
+                <div id="jd-soft-skills-list" class="jd-tags-wrap">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
+
+              <!-- Important Job Keywords -->
+              <div id="jd-keywords-block" class="jd-section-block">
+                <div class="jd-section-header">
+                  <span>Important Keywords</span>
+                  <span id="jd-keywords-counter" class="badge badge-neutral">0 keywords</span>
+                </div>
+                <div id="jd-keywords-list" class="jd-tags-wrap">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Action Bar -->
+    <div class="analyzer-submit-box">
+      <div class="flex items-center gap-2">
+        <span class="badge badge-success">Ready to Analyze</span>
+        <span style="font-size: var(--text-xs); color: var(--text-muted);">Matches your qualifications directly with the job post</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="{{ url_for('analyzer.dashboard_view') }}" class="btn btn-secondary">
+          <span>View Sample Report</span>
+        </a>
+
+        <button type="submit" id="analyze-submit-btn" class="btn btn-primary btn-lg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          <span>Run Analysis</span>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Multi-Step Pipeline Loading Modal -->
+<div id="loading-pipeline-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pipeline-title">
+  <div class="modal-dialog">
+    <div class="loading-pipeline is-visible">
+      <div class="pipeline-spinner"></div>
+      <h2 id="pipeline-title" class="pipeline-title">Reviewing Your Application</h2>
+      <p class="pipeline-subtitle">Checking your experience against the job requirements...</p>
+
+      <ul class="pipeline-steps">
+        <li class="pipeline-step-item" data-step="1">
+          <div class="step-indicator">1</div>
+          <span>Reading your resume text and checking file structure</span>
+        </li>
+        <li class="pipeline-step-item" data-step="2">
+          <div class="step-indicator">2</div>
+          <span>Extracting your skills, experience, and education</span>
+        </li>
+        <li class="pipeline-step-item" data-step="3">
+          <div class="step-indicator">3</div>
+          <span>Comparing your background with the job posting</span>
+        </li>
+        <li class="pipeline-step-item" data-step="4">
+          <div class="step-indicator">4</div>
+          <span>Checking layout and ATS readability</span>
+        </li>
+        <li class="pipeline-step-item" data-step="5">
+          <div class="step-indicator">5</div>
+          <span>Preparing your match report and recommendations</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/analyzer.js') }}"></script>
+{% endblock %}

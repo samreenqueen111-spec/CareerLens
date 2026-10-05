@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-narrow section" style="text-align: center;">
+  <div style="font-size: 5rem; font-weight: 900; line-height: 1; color: var(--danger-solid); margin-bottom: 1rem;">
+    400
+  </div>
+  <h1 style="font-size: var(--text-2xl); margin-bottom: 0.75rem;">Invalid Request</h1>
+  <p style="font-size: var(--text-base); color: var(--text-secondary); max-width: 480px; margin-left: auto; margin-right: auto; margin-bottom: 2rem;">
+    {{ error_message or "The server could not understand or parse the request formatting." }}
+  </p>
+  <div class="flex items-center justify-center gap-3">
+    <a href="{{ url_for('analyzer.analyzer_view') }}" class="btn btn-primary">
+      <span>Go to Analyzer</span>
+    </a>
+    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
+      <span>Return Home</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

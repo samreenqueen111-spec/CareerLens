@@ -1,0 +1,16 @@
+# CareerLens AI - Core Web Dependencies
+Flask>=3.0.0,<4.0.0
+python-dotenv>=1.0.0
+Werkzeug>=3.0.0
+gunicorn>=21.2.0
+
+# Stage 2: Resume Parsing & Text Extraction Dependencies
+pypdf>=4.0.0
+python-docx>=1.1.0
+reportlab>=4.0.0
+
+# Future Stage Dependencies (Uncomment when implementing AI & DB stages)
+# openai>=1.20.0          # Future: LLM analysis & structured scoring
+# sentence-transformers   # Future: Semantic embeddings for skills & experience
+# flask-sqlalchemy>=3.1.0 # Future: Relational database integration
+# psycopg2-binary>=2.9.9  # Future: PostgreSQL driver

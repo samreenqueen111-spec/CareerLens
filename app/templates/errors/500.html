@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-narrow section" style="text-align: center;">
+  <div style="font-size: 5rem; font-weight: 900; line-height: 1; color: var(--danger-solid); margin-bottom: 1rem;">
+    500
+  </div>
+  <h1 style="font-size: var(--text-2xl); margin-bottom: 0.75rem;">Internal Server Error</h1>
+  <p style="font-size: var(--text-base); color: var(--text-secondary); max-width: 480px; margin-left: auto; margin-right: auto; margin-bottom: 2rem;">
+    {{ error_message or "An unexpected server condition was encountered. Our engineering team has been logged." }}
+  </p>
+  <div class="flex items-center justify-center gap-3">
+    <a href="{{ url_for('main.index') }}" class="btn btn-primary">
+      <span>Return to Home</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

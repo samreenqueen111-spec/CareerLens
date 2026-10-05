@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-narrow section" style="text-align: center;">
+  <div style="font-size: 5rem; font-weight: 900; line-height: 1; color: var(--primary-600); margin-bottom: 1rem;">
+    404
+  </div>
+  <h1 style="font-size: var(--text-2xl); margin-bottom: 0.75rem;">Page or Resource Not Found</h1>
+  <p style="font-size: var(--text-base); color: var(--text-secondary); max-width: 480px; margin-left: auto; margin-right: auto; margin-bottom: 2rem;">
+    {{ error_message or "The page you requested does not exist or has been relocated to another endpoint." }}
+  </p>
+  <div class="flex items-center justify-center gap-3">
+    <a href="{{ url_for('main.index') }}" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>Return to Home</span>
+    </a>
+    <a href="{{ url_for('analyzer.analyzer_view') }}" class="btn btn-secondary">
+      <span>Resume Analyzer</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

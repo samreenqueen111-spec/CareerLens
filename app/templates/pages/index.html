@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="hero-pill-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+      </svg>
+      <span>Resume &amp; Job Description Match Checker</span>
+    </div>
+
+    <h1 class="hero-title">
+      Know Exactly How Your Resume Matches the Job <span class="highlight">Before You Apply</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      Most resumes get filtered out before anyone reads them. CareerLens compares your resume directly against the job posting, highlights the skills you have, shows what you're missing, and gives you a clear plan to improve your application before you apply.
+    </p>
+
+    <div class="hero-cta-group">
+      <a href="{{ url_for('analyzer.analyzer_view') }}" class="btn btn-primary btn-lg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="12" y1="18" x2="12" y2="12"></line>
+          <line x1="9" y1="15" x2="15" y2="15"></line>
+        </svg>
+        <span>Analyze My Resume</span>
+      </a>
+
+      <a href="{{ url_for('analyzer.dashboard_view') }}" class="btn btn-secondary btn-lg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="3" y1="9" x2="21" y2="9"></line>
+          <line x1="9" y1="21" x2="9" y2="9"></line>
+        </svg>
+        <span>Explore Sample Dashboard</span>
+      </a>
+    </div>
+
+    <div class="hero-reassurance">
+      <div class="reassurance-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--success-solid);">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span>Works with PDF &amp; DOCX</span>
+      </div>
+      <div class="reassurance-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--success-solid);">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span>Checks for ATS formatting issues</span>
+      </div>
+      <div class="reassurance-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--success-solid);">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span>Practical tips you can actually use</span>
+      </div>
+    </div>
+
+    <!-- Product Preview Window -->
+    <div class="hero-preview-wrapper">
+      <div class="preview-topbar">
+        <div class="window-dots">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+        </div>
+        <div style="font-size: var(--text-xs); color: var(--text-muted); font-family: var(--font-mono);">
+          careerlens-ai // report-preview
+        </div>
+        <div class="badge badge-success">Verified Result</div>
+      </div>
+
+      <div class="preview-grid">
+        <div class="preview-card">
+          <div class="preview-card-title">Overall Match</div>
+          <div class="preview-score-row">
+            <span style="font-size: var(--text-2xl); font-weight: 800; color: var(--success-solid);">78%</span>
+            <span class="badge badge-success">Strong Match</span>
+          </div>
+          <p style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: 0.75rem;">
+            Your resume has strong full-stack foundations, with a few gaps in Kubernetes and Redis caching.
+          </p>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill fill-success" style="width: 78%;"></div>
+          </div>
+        </div>
+
+        <div class="preview-card">
+          <div class="preview-card-title">Missing Skills (Priority)</div>
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between" style="font-size: var(--text-xs);">
+              <span style="color: var(--text-main); font-weight: 600;">Kubernetes</span>
+              <span class="badge badge-danger">High Priority</span>
+            </div>
+            <div class="flex items-center justify-between" style="font-size: var(--text-xs);">
+              <span style="color: var(--text-main); font-weight: 600;">Redis Caching</span>
+              <span class="badge badge-warning">Medium Priority</span>
+            </div>
+            <div class="flex items-center justify-between" style="font-size: var(--text-xs);">
+              <span style="color: var(--text-main); font-weight: 600;">GraphQL</span>
+              <span class="badge badge-neutral">Nice-to-Have</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="section features-section" id="features">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-category">Features</div>
+      <h2>Everything You Need to Improve Your Application</h2>
+      <p>
+        Built around what hiring managers actually look for: relevant technical skills, solid experience, and clean formatting.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <!-- Feature 1: Resume-JD Matching -->
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+            <path d="M9 14l2 2 4-4"></path>
+          </svg>
+        </div>
+        <h3>Resume-to-JD Semantic Matching</h3>
+        <p>
+          We don't just count keyword matches. We look at whether your projects and work history show the tools and responsibilities the employer is asking for.
+        </p>
+        <ul class="feature-points">
+          <li>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="color: var(--primary-600);"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Recognizes related skills (like Postgres satisfying SQL requirements)</span>
+          </li>
+          <li>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="color: var(--primary-600);"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Shows separate scores for skills, experience, and keywords</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Feature 2: Skill Gap Analysis -->
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <h3>Skill Gap Analysis</h3>
+        <p>
+          See where your resume falls short before an employer does. We separate must-have skills from nice-to-haves so you know what matters most.
+        </p>
+        <ul class="feature-points">
+          <li>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="color: var(--primary-600);"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Flags deal-breaker skills versus optional preferences</span>
+          </li>
+          <li>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="color: var(--primary-600);"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Identifies transferable knowledge you can talk about in an interview</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Feature 3: ATS-Style Checks -->
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <h3>ATS-Style Verification</h3>
+        <p>
+          Screening software often drops candidates just because of odd columns or missing headers. We flag formatting issues so your resume parses cleanly.
+        </p>
+        <ul class="feature-points">
+          <li>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="color: var(--primary-600);"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Checks contact details, section headings, and readable layouts</span>
+          </li>
+          <li>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="color: var(--primary-600);"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Highlights formatting quirks that confuse resume screeners</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Feature 4: Personalized Learning Roadmap -->
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <line x1="8" y1="2" x2="8" y2="18"></line>
+            <line x1="16" y1="6" x2="16" y2="22"></line>
+          </svg>
+        </div>
+        <h3>Personalized Learning Roadmap</h3>
+        <p>
+          If you're missing key skills for a role you want, we help you prioritize what to learn first. No random tutorials—just the tools for this job.
+        </p>
+        <ul class="feature-points">
+          <li>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="color: var(--primary-600);"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Organized into high, medium, and optional learning phases</span>
+          </li>
+          <li>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="color: var(--primary-600);"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Links to official documentation and practical starting steps</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section (4 Steps) -->
+<section class="section" id="how-it-works">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-category">How It Works</div>
+      <h2>How CareerLens AI Works</h2>
+      <p>A simple 4-step process to review and strengthen your job applications.</p>
+    </div>
+
+    <div class="how-it-works-grid">
+      <!-- Step 1 -->
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3>Upload your resume</h3>
+        <p>
+          Drop in your PDF or DOCX file. We pull out your skills, work history, and contact details while checking that it reads cleanly.
+        </p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3>Paste the job posting</h3>
+        <p>
+          Paste the job description you're applying for, or try one of our sample tech roles.
+        </p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3>See your match breakdown</h3>
+        <p>
+          Check your score across skills, experience, and keywords, along with an ATS readability check.
+        </p>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step-card">
+        <div class="step-number">4</div>
+        <h3>Download your report</h3>
+        <p>
+          Export a clean PDF summary to use as a checklist while you update your resume.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Callout Banner -->
+<section class="section-sm">
+  <div class="container">
+    <div class="engineering-banner">
+      <div class="engineering-banner-text">
+        <div class="badge badge-neutral" style="margin-bottom: 0.5rem;">Honest Feedback</div>
+        <h3>Built by engineers for job seekers</h3>
+        <p>
+          We built CareerLens to take the guesswork out of job applications. You get a transparent breakdown of how your resume stacks up against the job posting—no AI fluff, just practical feedback.
+        </p>
+      </div>
+      <div>
+        <a href="{{ url_for('analyzer.analyzer_view') }}" class="btn btn-primary">
+          <span>Start Analyzing</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

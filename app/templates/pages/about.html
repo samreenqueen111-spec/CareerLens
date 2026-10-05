@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-narrow section-sm">
+  <!-- Breadcrumb -->
+  <div class="flex items-center gap-2" style="font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 0.75rem;">
+    <a href="{{ url_for('main.index') }}" style="color: var(--text-muted);">Home</a>
+    <span>/</span>
+    <span style="color: var(--text-main);">About</span>
+  </div>
+
+  <div style="margin-bottom: 2.5rem;">
+    <span class="badge badge-success" style="margin-bottom: 0.5rem;">How It Works</span>
+    <h1>CareerLens AI Architecture &amp; Methodology</h1>
+    <p style="font-size: var(--text-base); color: var(--text-secondary);">
+      We built CareerLens to help job seekers understand how automated screening software and hiring teams evaluate their resumes against job postings.
+    </p>
+  </div>
+
+  <div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+      <h3 style="font-size: var(--text-base); margin-bottom: 0;">How We Calculate Match Scores</h3>
+    </div>
+    <div class="card-body">
+      <p style="font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: 1rem;">
+        Instead of simply counting words, CareerLens evaluates your background across four areas:
+      </p>
+      <ul style="padding-left: 1.25rem; font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.8;">
+        <li><strong>Skills Match (40%):</strong> Compares both exact tools and related technologies you already know against the job's required and preferred skills.</li>
+        <li><strong>Experience Relevance (25%):</strong> Evaluates your years of experience and background against the role's seniority requirements.</li>
+        <li><strong>Keyword Coverage (20%):</strong> Checks whether meaningful domain terms from the job posting appear naturally in your resume.</li>
+        <li><strong>Education Alignment (15%):</strong> Compares your degree level and field of study with the employer's stated educational requirements.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Roadmap Section -->
+  <div class="card" id="roadmap" style="margin-bottom: 2rem;">
+    <div class="card-header">
+      <h3 style="font-size: var(--text-base); margin-bottom: 0;">Multi-Stage Product Roadmap</h3>
+    </div>
+    <div class="card-body">
+      <div class="flex flex-col gap-4">
+        <div style="border-left: 3px solid var(--success-solid); padding-left: 1rem;">
+          <div class="flex items-center gap-2">
+            <strong style="color: var(--text-main);">Stage 1: Production Web Foundation</strong>
+            <span class="badge badge-success">Completed</span>
+          </div>
+          <p style="font-size: var(--text-xs); color: var(--text-muted); margin-top: 0.25rem;">
+            Clean Flask application structure, modular blueprints, drag-and-drop file validation, and responsive dashboard views.
+          </p>
+        </div>
+
+        <div style="border-left: 3px solid var(--success-solid); padding-left: 1rem;">
+          <div class="flex items-center gap-2">
+            <strong style="color: var(--text-main);">Stages 2–6: Parsing, Matching, Gap Analysis &amp; Roadmaps</strong>
+            <span class="badge badge-success">Completed</span>
+          </div>
+          <p style="font-size: var(--text-xs); color: var(--text-muted); margin-top: 0.25rem;">
+            Document text parsing (PDF/DOCX), job description analysis, multi-metric compatibility scoring, ATS checks, and personalized career roadmaps.
+          </p>
+        </div>
+
+        <div style="border-left: 3px solid var(--success-solid); padding-left: 1rem;">
+          <div class="flex items-center gap-2">
+            <strong style="color: var(--text-main);">Stages 7–9: Database, Accounts &amp; PDF Reports</strong>
+            <span class="badge badge-success">Completed</span>
+          </div>
+          <p style="font-size: var(--text-xs); color: var(--text-muted); margin-top: 0.25rem;">
+            SQLite persistence, private user authentication with encrypted passwords, evaluation history, and downloadable 14-section PDF reports.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy Principles -->
+  <div class="card" id="privacy">
+    <div class="card-header">
+      <h3 style="font-size: var(--text-base); margin-bottom: 0;">Privacy &amp; Candidate Security</h3>
+    </div>
+    <div class="card-body">
+      <p style="font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: 1rem;">
+        CareerLens treats your career data with care and confidentiality:
+      </p>
+      <ul style="padding-left: 1.25rem; font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.8;">
+        <li>Your resumes and reports are private to your account. No other users can see them.</li>
+        <li>We never sell your contact information, work experience, or resume contents to third parties or recruiters.</li>
+        <li>You can delete any evaluation from your history at any time with one click.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

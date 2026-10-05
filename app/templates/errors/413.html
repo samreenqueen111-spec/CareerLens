@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-narrow section" style="text-align: center;">
+  <div style="font-size: 5rem; font-weight: 900; line-height: 1; color: var(--warning-solid); margin-bottom: 1rem;">
+    413
+  </div>
+  <h1 style="font-size: var(--text-2xl); margin-bottom: 0.75rem;">Resume File Too Large</h1>
+  <p style="font-size: var(--text-base); color: var(--text-secondary); max-width: 480px; margin-left: auto; margin-right: auto; margin-bottom: 2rem;">
+    {{ error_message or "The uploaded resume file exceeds the maximum permitted size of 5 MB. Please compress your PDF or DOCX file." }}
+  </p>
+  <div class="flex items-center justify-center gap-3">
+    <a href="{{ url_for('analyzer.analyzer_view') }}" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="1 4 1 10 7 10"></polyline>
+        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+      </svg>
+      <span>Try Uploading Again</span>
+    </a>
+    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
+      <span>Return Home</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

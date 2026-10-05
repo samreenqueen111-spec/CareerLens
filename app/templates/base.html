@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CareerLens AI - Production-grade Resume and Job Description Semantic Matching, ATS Checks, and Personalized Learning Roadmaps.">
+  <title>{{ page_title or "CareerLens AI - Intelligent Resume & Job Matching" }}</title>
+
+  <!-- Prevent Theme Flash -->
+  <script>
+    (function() {
+      try {
+        var theme = localStorage.getItem('careerlens-theme');
+        if (!theme) {
+          theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Favicon / Logo -->
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/logo.svg') }}">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/variables.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <!-- Page Specific Stylesheet Injections -->
+  {% block extra_css %}{% endblock %}
+<body class="site-body">
+  <!-- Subtle Ambient Glowing Aurora Background Orbs -->
+  <div class="ambient-glow-container" aria-hidden="true">
+    <div class="ambient-glow-orb orb-primary"></div>
+    <div class="ambient-glow-orb orb-cyan"></div>
+    <div class="ambient-glow-orb orb-emerald"></div>
+  </div>
+
+  <!-- Global Top Navigation -->
+  {% include "components/navbar.html" %}
+
+  <!-- Main Viewport Content -->
+  <main id="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Global Footer -->
+  {% include "components/footer.html" %}
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="global-toast-container" aria-live="polite"></div>
+
+  <!-- Core Scripts -->
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+  <!-- Page Specific Script Injections -->
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
