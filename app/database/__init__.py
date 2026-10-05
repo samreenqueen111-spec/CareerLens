@@ -1,5 +1,5 @@
 """
-App-level database forwarding module for CareerLens AI.
+App-level database forwarding module for CareerLens.
 """
 
 from database.database import get_db, init_db, close_db, get_db_path, close_connection

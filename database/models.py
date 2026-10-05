@@ -1,5 +1,5 @@
 """
-Database Models for CareerLens AI (Stage 7).
+Database Models for CareerLens (Stage 7).
 Implements the AnalysisModel entity storing complete evaluations, match scores,
 skill gap breakdowns, ATS audit checklists, and career roadmaps in SQLite.
 
@@ -25,7 +25,7 @@ class DatabaseError(Exception):
 
 class UserModel:
     """
-    User entity for CareerLens AI (Stage 8).
+    User entity for CareerLens (Stage 8).
     Handles secure account creation, password verification via PBKDF2, and safe serialization.
     """
 

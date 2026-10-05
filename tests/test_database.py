@@ -1,5 +1,5 @@
 """
-Unit and Integration Test Suite for CareerLens AI Database & History Layer (Stage 7).
+Unit and Integration Test Suite for CareerLens Database & History Layer (Stage 7).
 Tests SQLite schema creation, AnalysisModel CRUD operations, parameterized SQL safety,
 graceful error handling, end-to-end persistence from /api/analyze, viewing saved reports,
 deletion, and empty state rendering.

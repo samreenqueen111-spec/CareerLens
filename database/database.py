@@ -1,5 +1,5 @@
 """
-Database connection and lifecycle management for CareerLens AI (Stage 7).
+Database connection and lifecycle management for CareerLens (Stage 7).
 Uses standard library sqlite3 for zero-dependency, reliable, persistent storage.
 Supports connection pooling via Flask's application context (g) and standalone script execution.
 """

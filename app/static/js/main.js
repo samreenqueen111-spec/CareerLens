@@ -1,5 +1,5 @@
 /**
- * CareerLens AI - Core Application Scripts (main.js)
+ * CareerLens - Core Application Scripts (main.js)
  * Global navigation, toasts, modal windows, and accessible utilities.
  */
 

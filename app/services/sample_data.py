@@ -1,5 +1,5 @@
 """
-Sample analysis data provider for CareerLens AI (Stage 1).
+Sample analysis data provider for CareerLens (Stage 1).
 Provides high-fidelity, realistic structured data for dashboard preview
 and history simulation until Stage 2 NLP and AI models are integrated.
 """

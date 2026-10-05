@@ -1,5 +1,5 @@
 """
-Authentication and Authorization Service for CareerLens AI (Stage 8).
+Authentication and Authorization Service for CareerLens (Stage 8).
 Manages user signup, login, session state, password validation, and route security decorators.
 """
 

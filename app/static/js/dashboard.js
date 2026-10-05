@@ -1,5 +1,5 @@
 /**
- * CareerLens AI - Results Dashboard Controller (dashboard.js)
+ * CareerLens - Results Dashboard Controller (dashboard.js)
  * Animates score meters, handles interactive skill tabs, and report export.
  */
 

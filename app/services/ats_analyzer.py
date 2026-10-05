@@ -1,5 +1,5 @@
 """
-Stage 5: ATS-Style Resume Analyzer Service for CareerLens AI.
+Stage 5: ATS-Style Resume Analyzer Service for CareerLens.
 Analyzes the actual uploaded and parsed resume for common Applicant Tracking System (ATS)
 readability, structural integrity, and formatting standards.
 

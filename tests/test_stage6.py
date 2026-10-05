@@ -1,6 +1,6 @@
 """
 Unit and Integration Test Suite for Stage 6:
-Personalized Career Learning Roadmap for CareerLens AI.
+Personalized Career Learning Roadmap for CareerLens.
 
 Tests:
 1. Roadmap generation using REAL missing and weak skills.

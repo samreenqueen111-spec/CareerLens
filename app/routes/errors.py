@@ -27,7 +27,7 @@ def bad_request_error(error):
         }), 400
     return render_template(
         "errors/400.html",
-        page_title="Bad Request - CareerLens AI",
+        page_title="Bad Request - CareerLens",
         error_code=400,
         error_message="The request could not be processed due to invalid parameters or formatting."
     ), 400
@@ -44,7 +44,7 @@ def not_found_error(error):
         }), 404
     return render_template(
         "errors/404.html",
-        page_title="Page Not Found - CareerLens AI",
+        page_title="Page Not Found - CareerLens",
         error_code=404,
         error_message="The page or resource you are looking for does not exist or has been relocated."
     ), 404
@@ -61,7 +61,7 @@ def request_entity_too_large(error):
         }), 413
     return render_template(
         "errors/413.html",
-        page_title="File Size Exceeded - CareerLens AI",
+        page_title="File Size Exceeded - CareerLens",
         error_code=413,
         error_message="The uploaded document exceeds the maximum allowed size of 5 MB. Please compress your PDF or DOCX file."
     ), 413
@@ -78,7 +78,7 @@ def internal_server_error(error):
         }), 500
     return render_template(
         "errors/500.html",
-        page_title="Server Error - CareerLens AI",
+        page_title="Server Error - CareerLens",
         error_code=500,
         error_message="An internal server error occurred. Our engineering logs have been notified."
     ), 500

@@ -1,5 +1,5 @@
 """
-Stage 5: Skill Gap Analyzer Service for CareerLens AI.
+Stage 5: Skill Gap Analyzer Service for CareerLens.
 Analyzes real Resume-to-Job matching results to identify:
 1. Missing Required Skills (High Priority with impact and learning directions)
 2. Missing Preferred Skills (Medium/Low Priority with impact and learning directions)

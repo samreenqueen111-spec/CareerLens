@@ -24,7 +24,7 @@ def analyzer_view():
 
     return render_template(
         "pages/analyzer.html",
-        page_title="Resume Analyzer - CareerLens AI",
+        page_title="Resume Analyzer - CareerLens",
         active_page="analyzer",
         active_resume=active_resume
     )
@@ -83,7 +83,7 @@ def dashboard_view():
 
     html = render_template(
         "pages/dashboard.html",
-        page_title=f"Analysis Results: {analysis_data['job_title']} - CareerLens AI",
+        page_title=f"Analysis Results: {analysis_data['job_title']} - CareerLens",
         active_page="dashboard",
         analysis=analysis_data
     )
@@ -107,7 +107,7 @@ def history_view():
 
     return render_template(
         "pages/history.html",
-        page_title="Analysis History - CareerLens AI",
+        page_title="Analysis History - CareerLens",
         active_page="history",
         history_items=history_items
     )

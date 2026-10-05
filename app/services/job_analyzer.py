@@ -1,5 +1,5 @@
 """
-Job Description Analyzer Service for CareerLens AI (Stage 3).
+Job Description Analyzer Service for CareerLens (Stage 3).
 Performs pure-Python text extraction to extract and categorize:
 - Required technical skills
 - Preferred / nice-to-have technical skills

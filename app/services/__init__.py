@@ -1,5 +1,5 @@
 """
-Services module for CareerLens AI.
+Services module for CareerLens.
 Encapsulates business logic, data parsing, analysis coordination, and storage.
 """
 

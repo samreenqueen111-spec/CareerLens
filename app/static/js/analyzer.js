@@ -1,5 +1,5 @@
 /**
- * CareerLens AI - Analyzer Workspace Controller (analyzer.js - Stage 3)
+ * CareerLens - Analyzer Workspace Controller (analyzer.js - Stage 3)
  * Manages drag & drop file uploads, real-time client & server-side validation,
  * automatic PDF/DOCX text extraction, detected section badges, extracted text preview,
  * and REAL Job Description Analysis (skills, preferred, soft skills, education, experience, keywords).

@@ -1,5 +1,5 @@
 """
-Stage 6: Personalized Career Learning Roadmap Service for CareerLens AI.
+Stage 6: Personalized Career Learning Roadmap Service for CareerLens.
 
 Generates a realistic, highly personalized learning roadmap based ONLY on skills
 that are actually missing or weak for the target job description.

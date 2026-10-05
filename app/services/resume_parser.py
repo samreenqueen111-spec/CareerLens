@@ -1,5 +1,5 @@
 """
-Resume Parser Service for CareerLens AI (Stage 2).
+Resume Parser Service for CareerLens (Stage 2).
 Handles robust file validation, secure storage, text extraction from PDF and DOCX,
 and rule-based detection of standard resume sections without external LLM dependencies.
 """

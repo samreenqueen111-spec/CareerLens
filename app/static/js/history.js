@@ -1,5 +1,5 @@
 /**
- * CareerLens AI - History Workspace Controller (history.js)
+ * CareerLens - History Workspace Controller (history.js)
  * Manages search/filter, delete confirmations with modal, and empty state transitions.
  */
 

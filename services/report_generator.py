@@ -1,5 +1,5 @@
 """
-Report Generator Service for CareerLens AI (Stage 9).
+Report Generator Service for CareerLens (Stage 9).
 Generates publication-quality, professional PDF candidate evaluation reports
 using ReportLab with precise typography, structured scorecard grids,
 dynamic running headers/footers, and page numbering.
@@ -54,7 +54,7 @@ class NumberedCanvas(canvas.Canvas):
 
         # Running Header (pages 2+)
         if self._pageNumber > 1:
-            self.drawString(40, 752, "CareerLens AI • Professional Candidate Evaluation Report")
+            self.drawString(40, 752, "CareerLens • Professional Candidate Evaluation Report")
             self.drawRightString(letter[0] - 40, 752, "Confidential Candidate Analysis")
             self.setStrokeColor(HexColor("#cbd5e1"))
             self.setLineWidth(0.5)
@@ -68,7 +68,7 @@ class NumberedCanvas(canvas.Canvas):
         self.drawString(
             40,
             30,
-            "CareerLens AI Platform • Evaluation private to account holder • Not for public distribution"
+            "CareerLens Platform • Evaluation private to account holder • Not for public distribution"
         )
         page_str = f"Page {self._pageNumber} of {page_count}"
         self.drawRightString(letter[0] - 40, 30, page_str)
@@ -85,7 +85,7 @@ class ReportGeneratorError(Exception):
 
 class ReportGenerator:
     """
-    Generates high-fidelity PDF evaluation dossiers for completed CareerLens AI analyses.
+    Generates high-fidelity PDF evaluation dossiers for completed CareerLens analyses.
     Includes all 14 required sections:
     1. Candidate/Resume summary
     2. Target Job Title & Company
@@ -264,7 +264,7 @@ class ReportGenerator:
 
     @classmethod
     def _build_header_banner(cls, story: list, data: dict, styles: dict):
-        """Render CareerLens AI branded header with analysis target metadata."""
+        """Render CareerLens branded header with analysis target metadata."""
         job_title = data.get("job_title") or "Target Role"
         company = data.get("company") or "Target Organization"
         analysis_id = data.get("id") or "analysis-report"
@@ -805,7 +805,7 @@ class ReportGenerator:
         """Privacy guarantee and disclaimer note."""
         notice_table = Table([[
             Paragraph(
-                "<b>CONFIDENTIALITY NOTICE:</b> This candidate evaluation report was generated automatically by CareerLens AI "
+                "<b>CONFIDENTIALITY NOTICE:</b> This candidate evaluation report was generated automatically by CareerLens "
                 "for the authorized user. No passwords, credentials, or personal secrets are stored in this document. "
                 "Completing learning roadmaps prepares candidates for technical screening but does not guarantee employment.",
                 styles["Disclaimer"]

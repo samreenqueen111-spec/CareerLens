@@ -1,5 +1,5 @@
 """
-CareerLens AI - Application Entry Point.
+CareerLens - Application Entry Point.
 Run with:
     python run.py
 or
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     debug = os.environ.get("FLASK_DEBUG", "1").lower() in ("1", "true", "yes")
 
     print("=" * 65)
-    print("  [*] Starting CareerLens AI (Production Suite)")
+    print("  [*] Starting CareerLens (Production Suite)")
     print(f"  [+] Local Server: http://{host}:{port}")
     print(f"  [+] Analyzer URL: http://{host}:{port}/analyzer")
     print(f"  [+] Dashboard:    http://{host}:{port}/dashboard")

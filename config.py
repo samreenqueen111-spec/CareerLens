@@ -22,7 +22,7 @@ class Config:
     UPLOAD_FOLDER = BASE_DIR / os.environ.get("UPLOAD_FOLDER", "uploads")
     
     # Application metadata
-    APP_NAME = "CareerLens AI"
+    APP_NAME = "CareerLens"
     APP_VERSION = "1.0.0-stage9"
     
     # Stage 7 Database Configuration (SQLite)

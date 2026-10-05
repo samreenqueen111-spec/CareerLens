@@ -1,5 +1,5 @@
 """
-Routes module for CareerLens AI.
+Routes module for CareerLens.
 Exports Blueprints for registration in the Flask application factory.
 """
 

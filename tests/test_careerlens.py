@@ -1,5 +1,5 @@
 """
-Integration test suite for CareerLens AI (Stage 1 & Stage 2).
+Integration test suite for CareerLens (Stage 1 & Stage 2).
 Validates routes, API endpoints, error handling, templates,
 real PDF and DOCX resume parsing, and section detection.
 """
@@ -37,7 +37,7 @@ class CareerLensTestCase(unittest.TestCase):
         self.assertIn("Skill Gap Analysis", html)
         self.assertIn("ATS-Style Verification", html)
         self.assertIn("Personalized Learning Roadmap", html)
-        self.assertIn("How CareerLens AI Works", html)
+        self.assertIn("How CareerLens Works", html)
 
     def test_analyzer_view(self):
         """Verify analyzer page renders upload dropzone and JD editor."""
@@ -79,7 +79,7 @@ class CareerLensTestCase(unittest.TestCase):
         resp = self.client.get("/about")
         self.assertEqual(resp.status_code, 200)
         html = resp.get_data(as_text=True)
-        self.assertIn("CareerLens AI Architecture", html)
+        self.assertIn("CareerLens Architecture", html)
         self.assertIn("Multi-Stage Product Roadmap", html)
 
     def test_sample_jd_endpoint(self):

@@ -1,11 +1,11 @@
-# CareerLens AI - Candidate Intelligence Platform (Stages 1–9)
+# CareerLens - Candidate Intelligence Platform (Stages 1–9)
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/samreenqueen111-spec/CareerLens-AI)
-[![Live GitHub Repo](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/samreenqueen111-spec/CareerLens-AI)
-[![Tests Passing](https://img.shields.io/badge/Tests-80%2F80%20Passing-brightgreen)](https://github.com/samreenqueen111-spec/CareerLens-AI)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/samreenqueen111-spec/CareerLens)
+[![Live GitHub Repo](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/samreenqueen111-spec/CareerLens)
+[![Tests Passing](https://img.shields.io/badge/Tests-80%2F80%20Passing-brightgreen)](https://github.com/samreenqueen111-spec/CareerLens)
 
 
-CareerLens AI is a production-quality web application designed to help job seekers, students, and professionals understand how well their resume matches a specific job and what they should improve before applying.
+CareerLens is a production-quality web application designed to help job seekers, students, and professionals understand how well their resume matches a specific job and what they should improve before applying.
 
 Stage 2 introduced **Real Resume Parsing** with `pypdf` and `python-docx`, section detection across 8 standard resume sections, client & server-side validation, safe non-public upload storage, and dynamic text previews.
 
@@ -27,12 +27,12 @@ Stage 9 introduces **Professional Analysis PDF Reports** (`services/report_gener
 
 ## Cloud Deployment Guide
 
-CareerLens AI is configured for production cloud deployment with **Render**, **Railway**, **Fly.io**, and **Docker**.
+CareerLens is configured for production cloud deployment with **Render**, **Railway**, **Fly.io**, and **Docker**.
 
 ### Option A: 1-Click Deploy to Render (Free Tier)
 1. Go to [render.com](https://render.com) and log in with your GitHub account (**samreenqueen111-spec**).
 2. Click **New +** > **Web Service**.
-3. Select your repository: **`samreenqueen111-spec/CareerLens-AI`**.
+3. Select your repository: **`samreenqueen111-spec/CareerLens`**.
 4. Render will automatically detect the settings from [`render.yaml`](render.yaml) & [`Procfile`](Procfile):
    - **Environment:** `Python`
    - **Build Command:** `pip install -r requirements.txt`
@@ -40,20 +40,20 @@ CareerLens AI is configured for production cloud deployment with **Render**, **R
 5. Under **Environment Variables**, set:
    - `SECRET_KEY`: *(Generate a secure random string or use the default generated value)*
    - `FLASK_ENV`: `production`
-6. Click **Create Web Service**. Your app will be live at `https://careerlens-ai.onrender.com` in 2 minutes!
+6. Click **Create Web Service**. Your app will be live at `https://careerlens.onrender.com` in 2 minutes!
 
 ### Option B: Deploy with Docker
 ```bash
 # Build the production container image
-docker build -t careerlens-ai .
+docker build -t careerlens .
 
 # Run the container
-docker run -d -p 5000:5000 -e SECRET_KEY=your_production_secret careerlens-ai
+docker run -d -p 5000:5000 -e SECRET_KEY=your_production_secret careerlens
 ```
 
 ### Option C: Deploy to Railway
 1. Go to [railway.app](https://railway.app) and click **New Project**.
-2. Select **Deploy from GitHub repo** > **`samreenqueen111-spec/CareerLens-AI`**.
+2. Select **Deploy from GitHub repo** > **`samreenqueen111-spec/CareerLens`**.
 3. Railway automatically detects `Procfile` and deploys the app with Gunicorn.
 
 ---
@@ -347,7 +347,7 @@ An automated heuristic audit evaluating uploaded resumes against 11 industry-sta
 ## Main Screens
 
 ### 1. Landing Page (`/`)
-- Professional CareerLens AI branding with custom SVG brandmark.
+- Professional CareerLens branding with custom SVG brandmark.
 - Clear value proposition: *"Know Exactly How Your Resume Matches the Job Before You Apply"*.
 - Prominent **"Analyze My Resume"** primary CTA.
 - 4 Core Capabilities:
@@ -401,7 +401,7 @@ An automated heuristic audit evaluating uploaded resumes against 11 industry-sta
 ## Project Structure
 
 ```
-careerlens-ai/
+careerlens/
 ├── .env                              # Local environment variables
 ├── .env.example                      # Example environment variables & future stubs
 ├── .gitignore                        # Production gitignore for Python, uploads & secrets
@@ -446,7 +446,7 @@ careerlens-ai/
     │   │   ├── dashboard.js          # Radial gauge animator, clipboard copy, print
     │   │   └── history.js            # Live filter, delete confirmation modal, state
     │   └── images/
-    │       └── logo.svg              # CareerLens AI brandmark
+    │       └── logo.svg              # CareerLens brandmark
     └── templates/
         ├── base.html                 # Master layout with anti-flicker theme script
         ├── components/
@@ -516,7 +516,7 @@ The application will start on:
 
 ## Testing Real Resume Parsing & Job Description Analysis
 
-CareerLens AI includes two pre-built sample resumes in the `samples/` directory:
+CareerLens includes two pre-built sample resumes in the `samples/` directory:
 - `samples/sample_resume.pdf`
 - `samples/sample_resume.docx`
 
@@ -713,4 +713,4 @@ All 77 tests pass with 100% success rate across parsing, matching, gap analysis,
 
 ## License
 
-CareerLens AI is licensed under the MIT License.
+CareerLens is licensed under the MIT License.

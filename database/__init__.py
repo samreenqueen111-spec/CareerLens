@@ -1,5 +1,5 @@
 """
-Database module for CareerLens AI (Stage 7).
+Database module for CareerLens (Stage 7).
 Provides database connection, table initialization, and AnalysisModel entity.
 """
 

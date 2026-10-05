@@ -1,5 +1,5 @@
 """
-CareerLens AI - Resume to Job Matching Engine (Stage 4).
+CareerLens - Resume to Job Matching Engine (Stage 4).
 Performs transparent, deterministic matching between parsed resume data
 and analyzed job description data without relying on random scores or LLMs.
 

@@ -1,5 +1,5 @@
 """
-Storage Service for CareerLens AI (Stage 7).
+Storage Service for CareerLens (Stage 7).
 Provides an interface for storing and managing analysis history and parsed resume reports
 backed by persistent SQLite storage via AnalysisModel.
 """

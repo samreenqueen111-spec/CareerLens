@@ -1,5 +1,5 @@
 """
-CareerLens AI - Application Factory.
+CareerLens - Application Factory.
 Initializes Flask app, registers blueprints, configures extensions,
 and provides context processors.
 """
@@ -58,7 +58,7 @@ def create_app(config_class=None):
     @app.context_processor
     def inject_global_template_vars():
         return {
-            "app_name": app.config.get("APP_NAME", "CareerLens AI"),
+            "app_name": app.config.get("APP_NAME", "CareerLens"),
             "app_version": app.config.get("APP_VERSION", "1.0.0-stage8"),
             "current_year": datetime.now().year,
             "current_user": getattr(g, "user", None),

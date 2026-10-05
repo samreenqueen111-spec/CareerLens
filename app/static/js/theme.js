@@ -1,5 +1,5 @@
 /**
- * CareerLens AI - Theme Controller (theme.js)
+ * CareerLens - Theme Controller (theme.js)
  * Manages light / dark mode switching, persistence via localStorage,
  * and system preference synchronization.
  */

@@ -1,5 +1,5 @@
 """
-CareerLens AI - Authentication & Authorization Service Proxy (Stage 8).
+CareerLens - Authentication & Authorization Service Proxy (Stage 8).
 Re-exports AuthService and decorators from app.services.auth_service.
 """
 

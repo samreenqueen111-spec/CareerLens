@@ -1,5 +1,5 @@
 """
-Auth Blueprint for CareerLens AI (Stage 8).
+Auth Blueprint for CareerLens (Stage 8).
 Provides web routes and JSON API endpoints for user registration, login, logout,
 and session validation with secure password handling.
 """
@@ -29,7 +29,7 @@ def signup_view():
         if err:
             error_msg = err
         else:
-            flash(f"Welcome to CareerLens AI, {user.name}! Your account has been created.", "success")
+            flash(f"Welcome to CareerLens, {user.name}! Your account has been created.", "success")
             next_url = request.args.get("next")
             # Basic open redirect guard
             if next_url and next_url.startswith("/"):
@@ -38,7 +38,7 @@ def signup_view():
 
     return render_template(
         "pages/signup.html",
-        page_title="Create Account - CareerLens AI",
+        page_title="Create Account - CareerLens",
         active_page="signup",
         error=error_msg,
         name=name,
@@ -71,7 +71,7 @@ def login_view():
 
     return render_template(
         "pages/login.html",
-        page_title="Sign In - CareerLens AI",
+        page_title="Sign In - CareerLens",
         active_page="login",
         error=error_msg,
         email=email
