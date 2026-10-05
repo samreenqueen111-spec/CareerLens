@@ -20,6 +20,39 @@ Stage 9 introduces **Professional Analysis PDF Reports** (`services/report_gener
 
 ---
 
+## Cloud Deployment Guide
+
+CareerLens AI is configured for production cloud deployment with **Render**, **Railway**, **Fly.io**, and **Docker**.
+
+### Option A: 1-Click Deploy to Render (Free Tier)
+1. Go to [render.com](https://render.com) and log in with your GitHub account (**samreenqueen111-spec**).
+2. Click **New +** > **Web Service**.
+3. Select your repository: **`samreenqueen111-spec/CareerLens-AI`**.
+4. Render will automatically detect the settings from [`render.yaml`](render.yaml) & [`Procfile`](Procfile):
+   - **Environment:** `Python`
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `gunicorn run:app`
+5. Under **Environment Variables**, set:
+   - `SECRET_KEY`: *(Generate a secure random string or use the default generated value)*
+   - `FLASK_ENV`: `production`
+6. Click **Create Web Service**. Your app will be live at `https://careerlens-ai.onrender.com` in 2 minutes!
+
+### Option B: Deploy with Docker
+```bash
+# Build the production container image
+docker build -t careerlens-ai .
+
+# Run the container
+docker run -d -p 5000:5000 -e SECRET_KEY=your_production_secret careerlens-ai
+```
+
+### Option C: Deploy to Railway
+1. Go to [railway.app](https://railway.app) and click **New Project**.
+2. Select **Deploy from GitHub repo** > **`samreenqueen111-spec/CareerLens-AI`**.
+3. Railway automatically detects `Procfile` and deploys the app with Gunicorn.
+
+---
+
 ## Stage 7 Features: SQLite Database & Analysis History (`database/`)
 
 Stage 7 introduces a clean, persistent storage architecture powered by SQLite and a dedicated data access layer:
